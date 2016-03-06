@@ -23,10 +23,10 @@ public class OperacoesCifra {
     private String key;
     private String keyChainFileName;
 
-    public OperacoesCifra(Configuracoes config) {
+    public OperacoesCifra() {
 
-        this.key = config.key;
-        this.keyChainFileName = config.keyChainFileName;
+        this.key = Configuracoes.key;
+        this.keyChainFileName = Configuracoes.keyChainFileName;
     }
 
     public void cifrarFicheiro() throws FileNotFoundException {
@@ -41,7 +41,7 @@ public class OperacoesCifra {
             encrypt.init(Cipher.ENCRYPT_MODE, secretKey);
 
             // Open the Plaintext file  
-            byte[] FileBytes = encrypt.doFinal(GetFileBytes(keyChainFileName));
+            byte[] FileBytes = encrypt.doFinal(getFileBytes(keyChainFileName));
 
             FileOutputStream fos = new FileOutputStream(keyChainFileName);
 
@@ -49,14 +49,14 @@ public class OperacoesCifra {
             fos.close();
         } catch (InvalidKeyException e) {
             System.out.println("Nao foi possivel efetuar a cifra do ficheiro. Chave invalida");
-            System.exit(-1);
+    
 
         } catch (IOException e) {
             System.out.println("Nao foi possivel escrever o ficheiro cifrado");
-            System.exit(-1);
+           
         } catch (Exception e) {
             System.out.println("Nao foi possivel cifrar o ficheiro. Algoritmo invalido");
-            System.exit(-1);
+           
         }
 
     }
@@ -70,7 +70,7 @@ public class OperacoesCifra {
             javax.crypto.Cipher decrypt = javax.crypto.Cipher.getInstance("AES/ECB/PKCS5Padding", "SunJCE");
 
             decrypt.init(javax.crypto.Cipher.DECRYPT_MODE, secretKey);
-            byte[] FileBytes = decrypt.doFinal(GetFileBytes(keyChainFileName));
+            byte[] FileBytes = decrypt.doFinal(getFileBytes(keyChainFileName));
 
             FileOutputStream fos = new FileOutputStream(keyChainFileName);
 
@@ -79,32 +79,32 @@ public class OperacoesCifra {
 
         } catch (InvalidKeyException e) {
             System.out.println("Nao foi possivel efetuar a decifra do ficheiro. Chave invalida");
-            System.exit(-1);
+         
 
         } catch (IOException e) {
             System.out.println("Nao foi possivel escrever o ficheiro decifra");
-            System.exit(-1);
+          
         } catch (Exception e) {
             System.out.println("Nao foi possivel decifra o ficheiro. Algoritmo invalido");
-            System.exit(-1);
+            
         }
 
     }
 
-    private byte[] GetFileBytes(String fileName) throws IOException {
-        File file = new File(fileName);
+    private byte[] getFileBytes(String fileName) throws IOException {
+        File keyFile = new File(fileName);
 
-        if (!file.exists()) {
+        if (!keyFile.exists()) {
             System.out.print("o ficheiro nao existe" + fileName);
             System.exit(1);
         }
 
         FileInputStream finput = null;
         try {
-            finput = new FileInputStream(file);
+            finput = new FileInputStream(keyFile);
         } catch (FileNotFoundException ex) {
         }
-        byte fileContent[] = new byte[(int) file.length()];
+        byte fileContent[] = new byte[(int) keyFile.length()];
         finput.read(fileContent);
 
         return fileContent;

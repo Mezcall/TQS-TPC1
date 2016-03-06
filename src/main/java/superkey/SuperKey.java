@@ -18,17 +18,16 @@ import java.util.logging.Logger;
  */
 public class SuperKey {
 
-    final static Scanner scanner = new Scanner(System.in);
-    final static Configuracoes config = new Configuracoes();
-    final static OperacoesCifra operacoesCifra = new OperacoesCifra(config);
+    final static Scanner scanner = new Scanner(System.in,"UTF-8");
+    
+    final static OperacoesCifra operacoesCifra = new OperacoesCifra();
 
     public static void main(String[] args) throws Exception {
         scanner.useDelimiter("\\n");
 
    
-        Scanner scFile = null;
-        File keyFile = new File(Configuracoes.keyChainFileName);
-   
+     
+      
         int op;
         do {
             System.out.println("1- Criar nova entrada");
@@ -42,15 +41,15 @@ public class SuperKey {
 
             switch (op) {
                 case 1:
-                    criarNovaEntrada(keyFile);
+                    criarNovaEntrada();
                     break;
 
                 case 2:
-                    listarFicheiro(keyFile, scFile);
+                    listarFicheiro( );
                     break;
 
                 case 3:
-                    pesquisarCredenciais(keyFile, scFile);
+                    pesquisarCredenciais();
                     break;
 
                 case 0:
@@ -62,16 +61,22 @@ public class SuperKey {
 
     }
 
-    public static void criarNovaEntrada(File keyFile) {
+    public static void criarNovaEntrada() {
+        File keyFile = new File(Configuracoes.keyChainFileName);
+   
         System.out.println("OPCAO 1");
         String line = "";
 
         if (!keyFile.exists()) {
             try {
-                keyFile.createNewFile();
+                if (!keyFile.createNewFile()) {
+                    System.out.println("Não foi possivel criar o ficheiro " + keyFile.getName());
+                    return;
+                }
             } catch (IOException ex) {
+                
                 System.out.println("Não foi possivel criar o ficheiro " + keyFile.getName());
-                System.exit(-1);
+                return;
             }
         }
 
@@ -85,7 +90,7 @@ public class SuperKey {
 
             System.out.println("O ficheiro " + keyFile.getName() + " não pode ser alterado!");
             return;
-        }
+        } 
 
         System.out.println("Aplicação/categoria? ");
         String platform = scanner.next();
@@ -114,8 +119,9 @@ public class SuperKey {
             return;
         }
 
-        BufferedWriter bw = new BufferedWriter(fw);
+        
         try {
+            BufferedWriter bw = new BufferedWriter(fw);
             bw.write(line);
             bw.newLine();
             bw.close();
@@ -123,14 +129,16 @@ public class SuperKey {
             operacoesCifra.cifrarFicheiro();
         } catch (IOException ex) {
             System.out.println("Aconteceu um erro ao tentar escrever no ficheiro ");
-        }
+        } 
+        
 
         System.out.println("Utilizador guardado.");
         System.out.println();
     }
 
-    public static void listarFicheiro(File keyFile, Scanner scFile) {
-
+    public static void listarFicheiro() {
+        Scanner scFile;
+        File keyFile = new File(Configuracoes.keyChainFileName);
         try {
             operacoesCifra.decifrarFicheiro();
 
@@ -159,8 +167,10 @@ public class SuperKey {
         System.out.println();
     }
 
-    public static void pesquisarCredenciais(File keyFile, Scanner scFile) {
+    public static void pesquisarCredenciais() {
         
+        File keyFile = new File(Configuracoes.keyChainFileName);
+         Scanner scFile;
         System.out.println("OPCAO 3");
         System.out.println("Aplicação a procurar? ");
         String search = scanner.next();
